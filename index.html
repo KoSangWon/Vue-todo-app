@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue todo</title>
+</head>
+<body>
+    <div id="app">
+        <h1>Todo App</h1>
+        <input type="text"
+         v-model="inputText"
+         v-on:keyup.enter="addItem"><!--v-model은 아래에서 연결했을 때 화면에 있는 inputText를 Vue의 data에 연결해 놓은 것이다. v-on:keyup은 키보드를 눌렀다 뗄 때의 이벤트를 설정하는 것이다.  .enter는 enter키 눌렀을 때로 특정해줌-->
+        <button v-on:click="addItem">add</button><!--v-on:click은 클릭할때의 동작을 설정하는 것이다.-->
+        <div>
+            <ul>
+                <li v-for="(todoItem, index) in todoItems"> <!--v-for은 반복문같은 역할을 한다., index를 부여함.-->
+                    {{todoItem}}
+                    <button v-on:click="removeItem(todoItem, index)">
+                        remove
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            //life cycle
+            created: function(){
+                this.fetchItems();//화면이 뜰 때 먼저 실행시켜줌
+            },
+            //method
+            methods: {
+                //등록
+                addItem: function(event){
+                    var value = this.inputText;
+                    this.todoItems.push(value);//데이터 배열에 넣어줌
+                    localStorage.setItem(value, value);
+                    this.inputText = ''; //다시 데이터를 비워 줌.
+                    //JSON.parse(), JSON.stringify() 나중에 사용해보기
+                },
+                //조회
+                fetchItems: function(){
+                    //axios.get('/todos') // 백엔드 사용할 때
+                    for(var i = 0; i < localStorage.length; i++){
+                        var value = localStorage.key(i);
+                        //console.log(value);
+                        //console.log(this);//this는 Vue를 가리킴
+                        this.todoItems.push(value);
+                    }
+                },
+                //삭제
+                removeItem: function(todoItem, index){
+                    //axios.delete('todos/' + index) //백엔드 사용 할 때
+                    console.log(todoItem, index);
+                    this.todoItems.splice(index, 1);//splice는 지우는 기능이 있다.
+                    localStorage.removeItem(todoItem);
+                }
+            },
+            //element
+            el: '#app',
+            //data
+            data: {
+                inputText: '',
+                todoItems: []
+            }
+        })
+    </script>
+</body>
+</html>
